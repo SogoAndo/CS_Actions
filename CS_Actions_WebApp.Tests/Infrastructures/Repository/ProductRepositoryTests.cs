@@ -23,9 +23,8 @@ public class ProductRepositoryTests
     public static async Task ClassInit(TestContext context)
     {
         // PostgreSQL 17のコンテナを定義して起動
-        _dbContainer = new PostgreSqlBuilder()
+        _dbContainer = new PostgreSqlBuilder("postgres:17-alpine")
             .WithDatabase("ActionsDB")
-            .WithImage("postgres:17-alpine")
             .Build();
 
         await _dbContainer.StartAsync();
@@ -63,7 +62,10 @@ public class ProductRepositoryTests
     [ClassCleanup]
     public static async Task ClassCleanup()
     {
-        await _dbContainer.DisposeAsync();
+        if (_dbContainer is not null)
+        {
+            await _dbContainer.DisposeAsync();
+        }
     }
 
     /// <summary>
@@ -91,7 +93,7 @@ public class ProductRepositoryTests
         Console.WriteLine("------------------------------");
 
         // 検証 (Assert)
-        Assert.AreEqual(14, products.Count);
+        Assert.HasCount(14, products);
         Assert.AreEqual("水性ボールペン(黒)", products[0].Name);
         Assert.AreEqual(1300, products[13].Price);
     }
