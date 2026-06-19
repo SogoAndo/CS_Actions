@@ -1,8 +1,11 @@
--- 1. データベースの作成
-CREATE DATABASE "ActionsDB";
+-- 1. データベースの作成（存在しない場合のみ）
+SELECT 'CREATE DATABASE "ActionsDB"'
+WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'ActionsDB')\gexec
 
 -- 2. 接続先データベースを ActionsDB に切り替える
 \c "ActionsDB"
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 3. 研修向け：常にクリーンな状態にするため、既存のテーブルを削除
 DROP TABLE IF EXISTS product;
